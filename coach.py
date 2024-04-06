@@ -1,6 +1,22 @@
 # Importando bibliotecas/módulos
 import requests
 from deep_translator import GoogleTranslator
+import os
+import platform
+
+# Função que limpa o terminal dependendo do Sistema Operacional
+def limpar_terminal():
+    if platform.system() == "Windows":
+        os.system('cls')
+    else:
+        os.system('clear')
+
+# Função que pausa o terminal dependendo do Sistema Operacional
+def pausar_terminal():
+    if platform.system() == "Windows":
+        os.system('pause')
+    else:
+        os.system('read -p "Pressione qualquer tecla para continuar..."')
 
 class Conselhos:
     """
@@ -30,11 +46,11 @@ class Conselhos:
         self.conselho = [
             '\n',
             '=' * 100,
-            f'--- ID: {self.id} ---'.center(100),
+            f'--- Conselho (ID): {self.id} ---'.center(100),
             '-' * 100,
-            'Texto original (en):',
+            'Texto original (Inglês):',
             self.texto,
-            '\nTexto traduzido (pt):',
+            '\nTexto traduzido (Português - Brazil):',
             self.traducao,
             '=' * 100
         ]
@@ -58,6 +74,7 @@ class Conselhos:
         """
         Método que imprime os IDs de todos os conselhos guardados no dicionário.
         """
+        print('Conselhos Guardados'.center(100))
         for itens in self.conselhos:
             print(f'- ID: {itens}')
 
@@ -70,13 +87,15 @@ menu = [
     '-' * 100,
     '[1] Mostrar conselho aleatório',
     '[2] Procurar conselho gerado anteriormente por ID',
-    '[3] Mostrar ID de conselhos guardados',
+    '[3] Mostrar conselhos por ID já guardado',
     '[4] Sair',
     '=' * 100
 ]
 
 while True:
     try:
+        limpar_terminal()
+        
         for item in menu:
             print(item)
         op = int(input('Opção: '))
@@ -97,7 +116,7 @@ while True:
                     else:
                         print(procurar_id)
                     
-                    continuar = str(input('Continuar a procurar ID? (S/N)\nOpção: ')).strip().lower()
+                    continuar = str(input('Procurar outro ID? (S/N)\nOpção: ')).strip().lower()
                     
                     if continuar == 'n' or continuar == 'não' or continuar == 'nao':
                         break
@@ -106,11 +125,14 @@ while True:
                 conselhos.conselhos_guardados()
                     
             case 4:
+                limpar_terminal()
                 print('\nSaindo...')
                 break
             
             case other:
                 print('\nERRO: Opção inválida.\nSelecione entre [1] e [4]')
+                
+        pausar_terminal()
                 
     except TypeError:
         print('\nErro: tipo de argumento inapropriado.')
