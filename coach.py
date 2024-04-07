@@ -28,8 +28,12 @@ class Conselhos:
         Inicializa o tradutor e o dicionário de conselhos e chama o método mostra_conselho.
         """
         self.tradutor = GoogleTranslator(source = 'en', target = 'pt')
+        self.tradutor_consulta = GoogleTranslator(source = 'en', target = 'pt')
         self.conselhos = {} # Armazena todos os conselhos gerados
+        self.conselhos_consulta = {} # Armazena todos os conselhos consultados
         self.mostra_conselho()
+        self.conselhos_consulta()
+        self.procura_conselhos_id()
 
     def mostra_conselho(self):
         """
@@ -65,12 +69,13 @@ class Conselhos:
         Método que procura um conselho pelo ID no dicionário de conselhos.
         Retorna o conselho se encontrado, caso contrário retorna uma mensagem de erro.
         """
+        self.id = id
         if id in self.conselhos: # Verifica se o ID está no dicionário self.conselhos
             return self.conselhos[id]
         else:
             return f'ID de conselho {id} não encontrado.'
         
-    def conselhos_guardados(self):
+    def conselhos_mostrados_antes(self):
         """
         Método que imprime os IDs de todos os conselhos guardados no dicionário.
         """
@@ -78,7 +83,41 @@ class Conselhos:
         for itens in self.conselhos:
             print(f'- ID: {itens}')
 
-conselhos = Conselhos()
+def conselhos_consulta(self, consulta):
+    self.consulta = consulta
+    self.url_consulta = f'https://api.adviceslip.com/advice/search/{consulta}'
+    
+    self.resposta_consulta = requests.get(self.url_consulta)
+    self.dados_consulta = self.resposta_consulta.json()
+    
+    self.textos_consultado = self.dados_consulta['slip']['advice']
+    self.traducao_consulta = self.tradutor.translate(self.textos_consultado)
+    self.resultados_totais = len(self.dados_consulta['slips'])
+
+    self.conselho_consulta = [
+        '\n',
+        '=' * 100,
+        f'--- Conselho Consultado (ID): {self.id_consulta} ---'.center(100),
+        '-' * 100,
+        'Texto original (Inglês):',
+        self.textos_consultado,
+        '\nTexto traduzido (Português - Brazil):',
+        self.traducao_consulta,
+        '=' * 100
+    ]
+
+    # Armazena o conselho gerado
+    self.conselhos[self.id_consulta] = '\n'.join(self.conselho_consulta)
+    
+    return self.conselhos[self.id_consulta]
+
+        
+    def procura_conselhos_id(self, id):
+        self.id = id
+        
+        return None
+
+classe_conselhos = Conselhos()
 
 menu = [
     '\n',
@@ -88,7 +127,9 @@ menu = [
     '[1] Mostrar conselho aleatório',
     '[2] Procurar conselho gerado anteriormente por ID',
     '[3] Mostrar conselhos por ID já guardado',
-    '[4] Sair',
+    '[4] Procurar conselho por palavra-chave/termo',
+    '[5] Procurar conselho por número de ID',
+    '[6] Sair',
     '=' * 100
 ]
 
@@ -102,17 +143,17 @@ while True:
 
         match op:    
             case 1:
-                print(conselhos.mostra_conselho())
+                print(classe_conselhos.mostra_conselho())
                 
             case 2:
                 while True:
                     id = int(input('\nProcurar ID: '))
                     print('Procurando conselho...')
-                    procurar_id = conselhos.procura_conselho(id)
+                    procurar_id = classe_conselhos.procura_conselho(id)
                     
                     if procurar_id == f'ID de conselho {id} não encontrado.':
-                        conselhos.mostra_conselho()
-                        print(conselhos.procura_conselho(id))
+                        classe_conselhos.mostra_conselho()
+                        print(classe_conselhos.procura_conselho(id))
                     else:
                         print(procurar_id)
                     
@@ -122,9 +163,22 @@ while True:
                         break
                     
             case 3:
-                conselhos.conselhos_guardados()
-                    
+                classe_conselhos.conselhos_mostrados_antes()
+            
             case 4:
+                consulta = input('Consulte uma palavra-chave: ')
+
+                if type(consulta) == str:
+                    consulta.strip().lower()
+
+                classe_conselhos.conselhos_consulta(consulta)
+
+            case 5:
+                id = int(input('Digite um ID: '))
+                
+                classe_conselhos.procura_conselhos_id(id)
+
+            case 6:
                 limpar_terminal()
                 print('\nSaindo...')
                 break
